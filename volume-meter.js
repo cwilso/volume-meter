@@ -39,7 +39,7 @@ Access the clipping through node.checkClipping(); use node.shutdown to get rid o
 */
 
 function createAudioMeter(audioContext,clipLevel,averaging,clipLag) {
-	var processor = audioContext.createScriptProcessor();
+	var processor = audioContext.createScriptProcessor(512);
 	processor.onaudioprocess = volumeAudioProcess;
 	processor.clipping = false;
 	processor.lastClip = 0;

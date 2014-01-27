@@ -28,9 +28,12 @@ Usage:
 audioNode = createAudioMeter(audioContext,clipLevel,averaging,clipLag);
 
 audioContext: the AudioContext you're using.
-clipLevel: the level (0 to 1) that you would consider "clipping".  Defaults to 0.98.
-averaging: how "smoothed" you would like the meter to be over time.  Should be between 0 and less than 1.  Defaults to 0.9.
-clipLag: how long you would like the "clipping" indicator to show after clipping has occured, in milliseconds.  Defaults to 750ms.
+clipLevel: the level (0 to 1) that you would consider "clipping". 
+   Defaults to 0.98.
+averaging: how "smoothed" you would like the meter to be over time.
+   Should be between 0 and less than 1.  Defaults to 0.95.
+clipLag: how long you would like the "clipping" indicator to show 
+   after clipping has occured, in milliseconds.  Defaults to 750ms.
 
 Access the clipping through node.checkClipping(); use node.shutdown to get rid of it.
 */
@@ -42,7 +45,7 @@ function createAudioMeter(audioContext,clipLevel,averaging,clipLag) {
 	processor.lastClip = 0;
 	processor.volume = 0;
 	processor.clipLevel = clipLevel || 0.98;
-	processor.averaging = averaging || 0.9;
+	processor.averaging = averaging || 0.95;
 	processor.clipLag = clipLag || 750;
 
 	// this will have no effect, since we don't copy the input to the output,
@@ -84,9 +87,8 @@ function volumeAudioProcess( event ) {
     // ... then take the square root of the sum.
     var rms =  Math.sqrt(sum / buf.length);
 
-    // Now smooth this out with the averaging factor.
-    var newVolume = (1-this.averaging) * rms;
-
-    // Take the max here because we want "fast attack, slow release."
-    this.volume = Math.max(rms, this.volume*this.averaging+newVolume);
+    // Now smooth this out with the averaging factor applied 
+    // to the previous sample - take the max here because we 
+    // want "fast attack, slow release."
+    this.volume = Math.max(rms, this.volume*this.averaging);
 }

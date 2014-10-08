@@ -48,7 +48,18 @@ window.onload = function() {
         	navigator.mozGetUserMedia;
 
         // ask for an audio input
-        navigator.getUserMedia({audio:true}, gotStream, didntGetStream);
+        navigator.getUserMedia(
+        {
+            "audio": {
+                "mandatory": {
+                    "googEchoCancellation": "false",
+                    "googAutoGainControl": "false",
+                    "googNoiseSuppression": "false",
+                    "googHighpassFilter": "false"
+                },
+                "optional": []
+            },
+        }, gotStream, didntGetStream);
     } catch (e) {
         alert('getUserMedia threw exception :' + e);
     }

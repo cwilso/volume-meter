@@ -71,13 +71,15 @@ function didntGetStream() {
     alert('Stream generation failed.');
 }
 
+var mediaStreamSource = null;
+
 function gotStream(stream) {
     // Create an AudioNode from the stream.
-    var mediaStreamSource = audioContext.createMediaStreamSource(stream);
+    mediaStreamSource = audioContext.createMediaStreamSource(stream);
 
     // Create a new volume meter and connect it.
-	meter = createAudioMeter(audioContext);
-	mediaStreamSource.connect(meter);
+    meter = createAudioMeter(audioContext);
+    mediaStreamSource.connect(meter);
 
     // kick off the visual updating
     drawLoop();

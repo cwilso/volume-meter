@@ -42,10 +42,7 @@ window.onload = function() {
     // Attempt to get audio input
     try {
         // monkeypatch getUserMedia
-        navigator.getUserMedia = 
-        	navigator.getUserMedia ||
-        	navigator.webkitGetUserMedia ||
-        	navigator.mozGetUserMedia;
+        navigator.getUserMedia = navigator.mediaDevices.getUserMedia;
 
         // ask for an audio input
         navigator.getUserMedia(

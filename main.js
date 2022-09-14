@@ -27,60 +27,47 @@ var canvasContext = null;
 var WIDTH=500;
 var HEIGHT=50;
 var rafID = null;
+var mediaStreamSource = null;
 
 window.onload = function() {
 
     // grab our canvas
 	canvasContext = document.getElementById( "meter" ).getContext("2d");
-	
-    // monkeypatch Web Audio
-    window.AudioContext = window.AudioContext || window.webkitAudioContext;
-	
+}
+
+function startMeter() {	
     // grab an audio context
     audioContext = new AudioContext();
 
     // Attempt to get audio input
-    try {
-        // monkeypatch getUserMedia
-        navigator.getUserMedia = navigator.mediaDevices.getUserMedia;
-
-        // ask for an audio input
-        navigator.getUserMedia(
-        {
-            "audio": {
-                "mandatory": {
-                    "googEchoCancellation": "false",
-                    "googAutoGainControl": "false",
-                    "googNoiseSuppression": "false",
-                    "googHighpassFilter": "false"
-                },
-                "optional": []
+    navigator.mediaDevices.getUserMedia(
+    {
+        "audio": {
+            "mandatory": {
+                "googEchoCancellation": "false",
+                "googAutoGainControl": "false",
+                "googNoiseSuppression": "false",
+                "googHighpassFilter": "false"
             },
-        }, gotStream, didntGetStream);
-    } catch (e) {
-        alert('getUserMedia threw exception :' + e);
-    }
+            "optional": []
+        },
+    }).then((stream) => {
+        // Create an AudioNode from the stream.
+        mediaStreamSource = audioContext.createMediaStreamSource(stream);
 
+        // Create a new volume meter and connect it.
+        meter = createAudioMeter(audioContext);
+        mediaStreamSource.connect(meter);
+
+        // kick off the visual updating
+        drawLoop();
+    }).catch((err) => {
+        // always check for errors at the end.
+        console.error(`${err.name}: ${err.message}`);
+        alert('Stream generation failed.');
+    });
 }
 
-
-function didntGetStream() {
-    alert('Stream generation failed.');
-}
-
-var mediaStreamSource = null;
-
-function gotStream(stream) {
-    // Create an AudioNode from the stream.
-    mediaStreamSource = audioContext.createMediaStreamSource(stream);
-
-    // Create a new volume meter and connect it.
-    meter = createAudioMeter(audioContext);
-    mediaStreamSource.connect(meter);
-
-    // kick off the visual updating
-    drawLoop();
-}
 
 function drawLoop( time ) {
     // clear the background
